@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lw.moveservice.mapper.MacVodMapper">
+    <!--取消原有推荐-->
+    <update id="cancelLevel">
+        UPDATE
+            mac_vod
+        SET vod_level = 0
+        WHERE
+            vod_level=9 OR vod_level=1
+    </update>
+<!-- 根据名称更新对应的推荐等级，更新为顶部幻灯片 9-->
+    <update id="updateTopLevel">
+        UPDATE
+            mac_vod
+        SET vod_level = 9
+        WHERE
+            vod_name=#{name}
+        limit 1
+    </update>
+    <!-- 根据名称更新对应的推荐等级，更新为12宫推荐-->
+    <update id="updateLevel">
+        UPDATE
+            mac_vod
+        SET vod_level = 1
+        WHERE
+            vod_name=#{name}
+        limit 1
+    </update>
+</mapper>
