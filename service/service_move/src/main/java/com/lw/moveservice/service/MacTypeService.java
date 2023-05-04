@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author lw
@@ -16,5 +16,15 @@ import java.util.List;
  */
 public interface MacTypeService extends IService<MacType> {
 
+    int updateById(Long id, MacType macType);
+
     List<OneSubject> getAllOneTwosubject();
+
+    OneSubject getSubTypeByParentId(Long id);
+
+    void addTypes(MacType types);
+
+    int addTypeByPid(Long id, MacType macType);
+
+    int deleteById(Long id);
 }

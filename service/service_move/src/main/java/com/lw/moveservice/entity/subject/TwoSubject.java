@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TwoSubject {
-    private String typeId;
+    private Long typeId;
 
     private String typeName;
 }

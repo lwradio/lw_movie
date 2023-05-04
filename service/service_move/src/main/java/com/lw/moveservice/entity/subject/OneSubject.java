@@ -7,9 +7,9 @@ import java.util.List;
 
 @Data
 public class OneSubject {
-    private String typeId;
+    private Long typeId;
 
     private String typeName;
     //一个一级分类有多个二级分类
-    private List<TwoSubject> children = new ArrayList<>();
+    private List<TwoSubject> children;
 }
