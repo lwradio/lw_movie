@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author lw
@@ -36,12 +36,12 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     public Map<String, Object> pageMoveCondition(long page, long limit, QueryMove queryMove) {
         //使用json传递数据，把json数据封装到对应对象
         //创建page对象
-        Page<MacVod> macVodPage = new Page<>(page,limit);
+        Page<MacVod> macVodPage = new Page<>(page, limit);
         QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
         //判断条件是否为空
-        if(queryMove==null){
+        if (queryMove == null) {
             System.out.println("空");
-        }else {
+        } else {
             String title = queryMove.getVodName();
             String typeId = queryMove.getTypeId();//二级类型
             String typeId_1 = queryMove.getTypeIdParent();//一级分类
@@ -62,7 +62,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         }
         wrapper.orderByDesc("vod_time");
         //调用方法实现条件查询分页
-        baseMapper.selectPage(macVodPage,wrapper);
+        baseMapper.selectPage(macVodPage, wrapper);
         long current = macVodPage.getCurrent();
         long pages = macVodPage.getPages();
         long size = macVodPage.getSize();
@@ -71,7 +71,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         boolean hasPrevious = macVodPage.hasPrevious();
         List<MacVod> records = macVodPage.getRecords();
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("items", records);
         map.put("current", current);
         map.put("pages", pages);
@@ -79,7 +79,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         map.put("total", total);
         map.put("hasNext", hasNext);
         map.put("hasPrevious", hasPrevious);
-        return map ;
+        return map;
 
     }
 
@@ -98,10 +98,10 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         List<VodPlayer> list = new LinkedList<>();
         String[] splitFrom = playFrom.split("\\$\\$\\$");
         String[] splitUrl = vodPlayUrl.split("\\$\\$\\$");
-        for (int i=0;i<splitFrom.length;i++) {
+        for (int i = 0; i < splitFrom.length; i++) {
             VodPlayer player = new VodPlayer();
             player.setPlayerName(splitFrom[i]);
-            player.setPlayUrl(splitUrl[i].replace('#','\n'));
+            player.setPlayUrl(splitUrl[i].replace('#', '\n'));
             player.setPlayUrls(splitUrl[i].split("#"));
             list.add(player);
 
@@ -109,26 +109,29 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         return list;
 
     }
-//更新幻灯片推荐
+
+    //更新幻灯片推荐
     @Override
-    public boolean updateLevel(){
-        List<String> move = new LinkedList<>();
-        List<String> tv = new LinkedList<>();
+    public boolean updateLevel() {
+        List<String> move = null;
+        List<String> tv = null;
         //先将之前的推荐清除
         baseMapper.cancelLevel();
-        DouBanConfig config = new DouBanConfig();
         try {
             //前6条为幻灯片，后6条为推荐
-             move = config.startLoad("move", "12", "0");
-             tv = config.startLoad("tv", "12", "0");
+            move = DouBanConfig.startLoad("move", "12", "0");
+            tv = DouBanConfig.startLoad("tv", "12", "0");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i <move.size(); i++) {
-            if (i<=5) {
+        if (move == null || tv == null) {
+            return false;
+        }
+        for (int i = 0; i < move.size(); i++) {
+            if (i <= 5) {
                 baseMapper.updateTopLevel(move.get(i));
                 baseMapper.updateTopLevel(tv.get(i));
-            }else{
+            } else {
                 baseMapper.updateLevel(move.get(i));
                 baseMapper.updateLevel(tv.get(i));
             }
@@ -136,7 +139,8 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         }
         return true;
     }
-//更新电影信息
+
+    //更新电影信息
     @Override
     public int updateMove(MacVod macVod) {
         String[] strings = rePlayUrl(macVod.getPlayList());
@@ -147,13 +151,12 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date date = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
-            macVod.setVodTime((int) (date.getTime()/1000));
+            macVod.setVodTime((int) (date.getTime() / 1000));
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        int i = baseMapper.updateById(macVod);
-        return i;
+        return baseMapper.updateById(macVod);
     }
 
     //删除一条记录
@@ -163,24 +166,24 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
-    public String[] rePlayUrl(List<VodPlayer> list){
+    public String[] rePlayUrl(List<VodPlayer> list) {
         String[] re = new String[2];
-        String url="",from="";
-        for(int i=0;i<list.size();i++){
+        String url = "", from = "";
+        for (int i = 0; i < list.size(); i++) {
             VodPlayer player = list.get(i);
-            if(player.getPlayerName()!=null&&player.getPlayUrl()!=null){
-                from+=(player.getPlayerName().replace(" ",""));//处理空格
+            if (player.getPlayerName() != null && player.getPlayUrl() != null) {
+                from += (player.getPlayerName().replace(" ", ""));//处理空格
                 //前端为每集换行，把换行换为#隔离每集
-                url+= (player.getPlayUrl().replace(" ","").replace("\n", "#"));
+                url += (player.getPlayUrl().replace(" ", "").replace("\n", "#"));
                 //如果是最后一条数据就不要加$$$
             }
-            if(i!=(list.size()-1)){
-                from+="$$$";
-                url+="$$$";
+            if (i != (list.size() - 1)) {
+                from += "$$$";
+                url += "$$$";
             }
         }
-        re[0]=from;
-        re[1]=url;
+        re[0] = from;
+        re[1] = url;
         return re;
     }
 }
