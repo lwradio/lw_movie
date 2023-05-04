@@ -31,14 +31,14 @@ public class MacVod implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "vod_id", type = IdType.AUTO)
-    private Integer vodId;
+    private Long vodId;
 
-    private String typeId;
+    private Long typeId;
 
     @TableField(value ="type_id_1")
-    private String typeId1;
+    private Long typeId1;
 
-    private Integer groupId;
+    private Long groupId;
 
     private String vodName;
 

@@ -1,8 +1,6 @@
 package com.lw.moveservice.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lw.moveservice.entity.MacVod;
 import com.lw.moveservice.entity.front.QueryMove;
@@ -11,7 +9,6 @@ import com.lw.moveservice.mapper.MacVodMapper;
 import com.lw.moveservice.service.MacVodService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lw.servicebase.config.douban.DouBanConfig;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,7 +30,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
 
     //条件查询带分页
     @Override
-    public Map<String, Object> pageMoveCondition(long page, long limit, QueryMove queryMove) {
+    public Map<String, Object> pageMoveCondition(int page, int limit, QueryMove queryMove) {
         //使用json传递数据，把json数据封装到对应对象
         //创建page对象
         Page<MacVod> macVodPage = new Page<>(page, limit);
@@ -84,18 +81,18 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     }
 
     @Override
-    public MacVod selectByid(String id) {
+    public MacVod selectByid(Long id) {
         MacVod macVod = baseMapper.selectById(id);
-        macVod.setPlayList(getMovePlayer(macVod.getVodId().toString()));
+        macVod.setPlayList(getMovePlayer(id));
         return macVod;
     }
 
     @Override
-    public List<VodPlayer> getMovePlayer(String id) {
+    public List<VodPlayer> getMovePlayer(Long id) {
         MacVod macVod = baseMapper.selectById(id);
         String playFrom = macVod.getVodPlayFrom();
         String vodPlayUrl = macVod.getVodPlayUrl();
-        List<VodPlayer> list = new LinkedList<>();
+        List<VodPlayer> list = new ArrayList<>();
         String[] splitFrom = playFrom.split("\\$\\$\\$");
         String[] splitUrl = vodPlayUrl.split("\\$\\$\\$");
         for (int i = 0; i < splitFrom.length; i++) {
@@ -142,7 +139,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
 
     //更新电影信息
     @Override
-    public int updateMove(MacVod macVod) {
+    public int updateMove(Long id, MacVod macVod) {
         String[] strings = rePlayUrl(macVod.getPlayList());
         macVod.setVodPlayFrom(strings[0]);
         macVod.setVodPlayUrl(strings[1]);
@@ -155,35 +152,36 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
+        macVod.setVodId(id);
         return baseMapper.updateById(macVod);
     }
 
     //删除一条记录
     @Override
-    public void deleteMove(String id) {
+    public void deleteMove(Long id) {
         baseMapper.deleteById(id);
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
     public String[] rePlayUrl(List<VodPlayer> list) {
         String[] re = new String[2];
-        String url = "", from = "";
+        StringBuilder url = new StringBuilder();
+        StringBuilder from = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             VodPlayer player = list.get(i);
             if (player.getPlayerName() != null && player.getPlayUrl() != null) {
-                from += (player.getPlayerName().replace(" ", ""));//处理空格
+                from.append(player.getPlayerName().replace(" ", ""));//处理空格
                 //前端为每集换行，把换行换为#隔离每集
-                url += (player.getPlayUrl().replace(" ", "").replace("\n", "#"));
+                url.append(player.getPlayUrl().replace(" ", "").replace("\n", "#"));
                 //如果是最后一条数据就不要加$$$
             }
             if (i != (list.size() - 1)) {
-                from += "$$$";
-                url += "$$$";
+                from.append("$$$");
+                url.append("$$$");
             }
         }
-        re[0] = from;
-        re[1] = url;
+        re[0] = from.toString();
+        re[1] = url.toString();
         return re;
     }
 }

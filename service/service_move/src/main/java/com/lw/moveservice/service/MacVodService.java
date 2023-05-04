@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author lw
@@ -19,15 +19,15 @@ import java.util.Map;
  */
 public interface MacVodService extends IService<MacVod> {
 
-    Map<String, Object> pageMoveCondition(long page, long limit, QueryMove queryMove);
+    Map<String, Object> pageMoveCondition(int page, int limit, QueryMove queryMove);
 
-    MacVod selectByid(String id);
+    MacVod selectByid(Long id);
 
-    List<VodPlayer> getMovePlayer(String id);
+    List<VodPlayer> getMovePlayer(Long Id);
 
     boolean updateLevel();
 
-    int updateMove(MacVod macVod);
+    int updateMove(Long id, MacVod macVod);
 
-    void deleteMove(String id);
+    void deleteMove(Long id);
 }
