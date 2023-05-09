@@ -1,6 +1,6 @@
 package com.lw.moveservice.entity.front;
 
-import com.lw.moveservice.controller.front.VodDTO;
+import com.lw.moveservice.controller.admin.VodDTO;
 import lombok.Data;
 
 import java.util.List;

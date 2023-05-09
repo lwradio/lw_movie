@@ -2,7 +2,7 @@ package com.lw.moveservice.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lw.moveservice.controller.front.VodDTO;
+import com.lw.moveservice.controller.admin.VodDTO;
 import com.lw.moveservice.entity.MacVod;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
@@ -12,7 +12,6 @@ import com.lw.moveservice.service.MacVodService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lw.servicebase.config.douban.DouBanConfig;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

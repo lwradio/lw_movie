@@ -1,4 +1,4 @@
-package com.lw.moveservice.controller.front;
+package com.lw.moveservice.controller.admin;
 
 import lombok.Data;
 

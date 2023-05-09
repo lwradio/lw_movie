@@ -11,3 +11,5 @@
 
 /common/common_utils/target/
 /service/service_move/target/
+/common/common.iml
+/lw_move.iml
