@@ -87,13 +87,17 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     @Override
     public MacVod selectByid(Long id) {
         MacVod macVod = baseMapper.selectById(id);
-        macVod.setPlayList(getMovePlayer(id));
+        macVod.setPlayList(getMovePlayer(macVod));
         return macVod;
     }
 
     @Override
     public List<VodPlayer> getMovePlayer(Long id) {
         MacVod macVod = baseMapper.selectById(id);
+        return getMovePlayer(macVod);
+    }
+
+    public List<VodPlayer> getMovePlayer(MacVod macVod) {
         String playFrom = macVod.getVodPlayFrom();
         String vodPlayUrl = macVod.getVodPlayUrl();
         List<VodPlayer> list = new ArrayList<>();
@@ -108,7 +112,6 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
 
         }
         return list;
-
     }
 
     //更新幻灯片推荐
