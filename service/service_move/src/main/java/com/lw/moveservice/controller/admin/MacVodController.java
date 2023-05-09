@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +81,23 @@ public class MacVodController {
         return R.ok();
     }
 
+    @ApiOperation("批量删除")
+    @DeleteMapping("/ids")
+    public R deleteMove(@RequestParam List<Long> ids) {
+        List<MacVod> macVods = new ArrayList<>();
+        ids.forEach(
+                id -> {
+                    MacVod macVod = new MacVod();
+                    macVod.setVodId(id);
+                    macVod.setIsDelete(1);
+                    macVod.setVodStatus(false);
+                    macVods.add(macVod);
+                }
+        );
+        macVodService.updateBatchById(macVods);
+        return R.ok();
+    }
+
     @ApiOperation("爬取豆瓣热门榜单更新推荐")
     @PutMapping("/level")
     public R updateLevel() {
@@ -97,7 +115,7 @@ public class MacVodController {
     @ApiOperation("重复片名")
     @GetMapping("/sameVodName")
     public R getsameVodName(@RequestParam int page, @RequestParam int limit) {
-        Map<String, Object> sameVodDTOS = macVodService.getsameVodName(page,limit);
+        Map<String, Object> sameVodDTOS = macVodService.getsameVodName(page, limit);
         return R.ok().data("sameVodDTOS", sameVodDTOS);
     }
 }

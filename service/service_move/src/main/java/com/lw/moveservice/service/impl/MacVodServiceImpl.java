@@ -49,6 +49,11 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
             String vodLevel = queryMove.getVodLevel();
             int isDelete = queryMove.getIsDelete();
             wrapper.eq("is_delete", isDelete);
+            if (isDelete == 0) {
+                wrapper.eq("vod_status", true);
+            } else {
+                wrapper.eq("vod_status", false);
+            }
             if (!StringUtils.isEmpty(title)) {
                 wrapper.like("vod_name", title);
             }
@@ -148,6 +153,9 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     //更新电影信息
     @Override
     public int updateMove(Long id, MacVod macVod) {
+        if (macVod.getIsDelete() == 1) {
+            throw new IllegalArgumentException("this vod has been delete!");
+        }
         String[] strings = rePlayUrl(macVod.getPlayList());
         macVod.setVodPlayFrom(strings[0]);
         macVod.setVodPlayUrl(strings[1]);
@@ -170,6 +178,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         MacVod macVod = new MacVod();
         macVod.setVodId(id);
         macVod.setIsDelete(1);
+        macVod.setVodStatus(false);
         baseMapper.updateById(macVod);
     }
 
@@ -233,10 +242,6 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         result.put("hasPrevious", macVodPage.hasPrevious());
         result.put("records", items);
         return result;
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
