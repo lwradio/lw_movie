@@ -195,6 +195,8 @@ public class MacVod implements Serializable {
     private String vodPlotName;
 
     private String vodPlotDetail;
+
+    private int isDelete;
 //格式化后的播放器列表
     @TableField(exist = false)
     private List<VodPlayer> playList;

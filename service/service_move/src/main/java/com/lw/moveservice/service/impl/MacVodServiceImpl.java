@@ -47,7 +47,8 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
             String typeId = queryMove.getTypeId();//二级类型
             String typeId_1 = queryMove.getTypeIdParent();//一级分类
             String vodLevel = queryMove.getVodLevel();
-
+            int isDelete = queryMove.getIsDelete();
+            wrapper.eq("is_delete", isDelete);
             if (!StringUtils.isEmpty(title)) {
                 wrapper.like("vod_name", title);
             }
@@ -166,7 +167,10 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     //删除一条记录
     @Override
     public void deleteMove(Long id) {
-        baseMapper.deleteById(id);
+        MacVod macVod = new MacVod();
+        macVod.setVodId(id);
+        macVod.setIsDelete(1);
+        baseMapper.updateById(macVod);
     }
 
     @Override
@@ -229,6 +233,10 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         result.put("hasPrevious", macVodPage.hasPrevious());
         result.put("records", items);
         return result;
+    }
+
+    @Override
+    public void deleteByIds(List<Long> ids) {
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存

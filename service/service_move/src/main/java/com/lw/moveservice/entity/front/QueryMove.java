@@ -16,4 +16,6 @@ public class QueryMove {
     private String typeId;
     @ApiModelProperty(value = "播放平台")
     private String vodPlayForm;
+    @ApiModelProperty(value = "是否删除")
+    private int isDelete;
 }
