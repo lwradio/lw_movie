@@ -2,13 +2,17 @@ package com.lw.moveservice.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lw.moveservice.controller.front.VodDTO;
 import com.lw.moveservice.entity.MacVod;
+import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
 import com.lw.moveservice.mapper.MacVodMapper;
 import com.lw.moveservice.service.MacVodService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lw.servicebase.config.douban.DouBanConfig;
+import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -16,6 +20,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -160,6 +165,38 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     @Override
     public void deleteMove(Long id) {
         baseMapper.deleteById(id);
+    }
+
+    @Override
+    public LevelMovie getLevelMovie() {
+        QueryWrapper<MacVod> wrapperTop = new QueryWrapper<>();
+        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
+        wrapperTop.eq("vod_level", 9);
+        wrapper.eq("vod_level", 1);
+        List<MacVod> macVods = baseMapper.selectList(wrapper);
+        List<MacVod> macVodsTop = baseMapper.selectList(wrapperTop);
+        List<VodDTO> vodDTOSTop = macVodsTop.stream()
+                .map(
+                        vod -> {
+                            VodDTO vodDTO = new VodDTO();
+                            BeanUtils.copyProperties(vod, vodDTO);
+                            return vodDTO;
+                        }
+                ).collect(Collectors.toList());
+        List<VodDTO> vodDTOS = macVods.stream()
+                .map(
+                        vod -> {
+                            VodDTO vodDTO = new VodDTO();
+                            BeanUtils.copyProperties(vod, vodDTO);
+                            return vodDTO;
+                        }
+                ).collect(Collectors.toList());
+        LevelMovie levelMovie = new LevelMovie();
+        levelMovie.setTop(vodDTOSTop);
+        levelMovie.setTopCount(vodDTOSTop.size());
+        levelMovie.setLow(vodDTOS);
+        levelMovie.setLowCount(vodDTOS.size());
+        return levelMovie;
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存

@@ -2,6 +2,7 @@ package com.lw.moveservice.service;
 
 import com.lw.moveservice.entity.MacVod;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
 
@@ -30,4 +31,6 @@ public interface MacVodService extends IService<MacVod> {
     int updateMove(Long id, MacVod macVod);
 
     void deleteMove(Long id);
+
+    LevelMovie getLevelMovie();
 }

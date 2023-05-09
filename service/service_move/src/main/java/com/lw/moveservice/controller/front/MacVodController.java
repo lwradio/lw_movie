@@ -4,6 +4,7 @@ package com.lw.moveservice.controller.front;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lw.commonutils.R;
 import com.lw.moveservice.entity.MacVod;
+import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
 import com.lw.moveservice.service.MacVodService;
@@ -80,10 +81,17 @@ public class MacVodController {
     }
 
     @ApiOperation("爬取豆瓣热门榜单更新推荐")
-    @GetMapping("/level")
+    @PutMapping("/level")
     public R updateLevel() {
         boolean flage = macVodService.updateLevel();
         return flage ? R.ok() : R.error();
+    }
+
+    @ApiOperation("查询推荐的影视")
+    @GetMapping("/level")
+    public R getLevelMovie() {
+        LevelMovie levelMovie = macVodService.getLevelMovie();
+        return R.ok().data("levelMovie",levelMovie);
     }
 }
 
