@@ -27,4 +27,15 @@
             vod_name=#{name}
         limit 1
     </update>
+    <select id="getsameVodName" resultType="com.lw.moveservice.entity.MacVod">
+        SELECT *
+        FROM mac_vod a
+        JOIN (
+            SELECT vod_name
+            FROM mac_vod
+            GROUP BY vod_name
+            HAVING COUNT(*) > 1
+        ) b ON a.vod_name = b.vod_name
+<!--        LIMIT #{current}, #{size}-->
+    </select>
 </mapper>

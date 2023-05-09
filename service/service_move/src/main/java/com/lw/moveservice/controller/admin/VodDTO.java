@@ -1,6 +1,9 @@
 package com.lw.moveservice.controller.admin;
 
+import com.lw.moveservice.entity.front.VodPlayer;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class VodDTO {
@@ -17,5 +20,10 @@ public class VodDTO {
 
     private String vodDirector;
     private int vodLevel;
+    private Integer vodTime;
+
+    private Integer vodTimeAdd;
+    private List<VodPlayer> playList;
+
 
 }

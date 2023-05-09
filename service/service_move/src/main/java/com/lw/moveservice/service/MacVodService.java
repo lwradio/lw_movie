@@ -1,12 +1,12 @@
 package com.lw.moveservice.service;
 
+
 import com.lw.moveservice.entity.MacVod;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,4 +33,6 @@ public interface MacVodService extends IService<MacVod> {
     void deleteMove(Long id);
 
     LevelMovie getLevelMovie();
+
+    Map<String, Object> getsameVodName(int page, int limit);
 }

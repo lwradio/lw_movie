@@ -91,7 +91,14 @@ public class MacVodController {
     @GetMapping("/level")
     public R getLevelMovie() {
         LevelMovie levelMovie = macVodService.getLevelMovie();
-        return R.ok().data("levelMovie",levelMovie);
+        return R.ok().data("levelMovie", levelMovie);
+    }
+
+    @ApiOperation("重复片名")
+    @GetMapping("/sameVodName")
+    public R getsameVodName(@RequestParam int page, @RequestParam int limit) {
+        Map<String, Object> sameVodDTOS = macVodService.getsameVodName(page,limit);
+        return R.ok().data("sameVodDTOS", sameVodDTOS);
     }
 }
 

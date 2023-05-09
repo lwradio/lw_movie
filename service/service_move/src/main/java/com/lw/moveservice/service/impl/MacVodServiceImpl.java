@@ -11,9 +11,9 @@ import com.lw.moveservice.mapper.MacVodMapper;
 import com.lw.moveservice.service.MacVodService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lw.servicebase.config.douban.DouBanConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -182,6 +182,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
                         vod -> {
                             VodDTO vodDTO = new VodDTO();
                             BeanUtils.copyProperties(vod, vodDTO);
+                            vodDTO.setPlayList(getMovePlayer(vod));
                             return vodDTO;
                         }
                 ).collect(Collectors.toList());
@@ -190,6 +191,7 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
                         vod -> {
                             VodDTO vodDTO = new VodDTO();
                             BeanUtils.copyProperties(vod, vodDTO);
+                            vodDTO.setPlayList(getMovePlayer(vod));
                             return vodDTO;
                         }
                 ).collect(Collectors.toList());
@@ -199,6 +201,34 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         levelMovie.setLow(vodDTOS);
         levelMovie.setLowCount(vodDTOS.size());
         return levelMovie;
+    }
+
+    @Override
+    public Map<String, Object> getsameVodName(int page, int limit) {
+        Page<MacVod> pg = new Page<>(page, limit);
+        Page<MacVod> macVodPage = baseMapper.getsameVodName(pg);
+        List<MacVod> macVods = macVodPage.getRecords();
+        if (macVods == null || macVods.isEmpty()) {
+            return null;
+        }
+        Map<String, List<VodDTO>> items = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        for (MacVod macVod : macVods) {
+            List<VodDTO> samVods = items.getOrDefault(macVod.getVodName(), new ArrayList<>());
+            VodDTO vodDTO = new VodDTO();
+            BeanUtils.copyProperties(macVod, vodDTO);
+            vodDTO.setPlayList(getMovePlayer(macVod));
+            samVods.add(vodDTO);
+            items.put(macVod.getVodName(), samVods);
+        }
+        result.put("current", macVodPage.getCurrent());
+        result.put("pages", macVodPage.getPages());
+        result.put("size", macVodPage.getSize());
+        result.put("total", macVodPage.getTotal());
+        result.put("hasNext", macVodPage.hasNext());
+        result.put("hasPrevious", macVodPage.hasPrevious());
+        result.put("records", items);
+        return result;
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
