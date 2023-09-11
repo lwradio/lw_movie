@@ -28,4 +28,13 @@ public interface MacVodMapper extends BaseMapper<MacVod> {
     int updateLevel(String name);
 
     Page<MacVod> getsameVodName(Page<MacVod> page);
+
+    int updateHitsDay();
+
+    int updateHitsWeek();
+
+    int updateHitsMonth();
+
+    int updateHits();
+
 }

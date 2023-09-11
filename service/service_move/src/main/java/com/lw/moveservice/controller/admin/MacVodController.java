@@ -3,6 +3,7 @@ package com.lw.moveservice.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lw.commonutils.R;
+import com.lw.moveservice.entity.HitEnum;
 import com.lw.moveservice.entity.MacVod;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
@@ -114,9 +115,16 @@ public class MacVodController {
 
     @ApiOperation("重复片名")
     @GetMapping("/sameVodName")
-    public R getsameVodName(@RequestParam int page, @RequestParam int limit) {
+    public R getSameVodName(@RequestParam int page, @RequestParam int limit) {
         Map<String, Object> sameVodDTOS = macVodService.getsameVodName(page, limit);
         return R.ok().data("sameVodDTOS", sameVodDTOS);
+    }
+
+    @ApiOperation("重置热度")
+    @PutMapping("/hit")
+    public R reloadHit(@RequestParam(required = false) HitEnum type) {
+        macVodService.reloadHit(type);
+        return R.ok();
     }
 }
 

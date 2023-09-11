@@ -1,6 +1,7 @@
 package com.lw.moveservice.service;
 
 
+import com.lw.moveservice.entity.HitEnum;
 import com.lw.moveservice.entity.MacVod;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lw.moveservice.entity.front.LevelMovie;
@@ -35,4 +36,6 @@ public interface MacVodService extends IService<MacVod> {
     LevelMovie getLevelMovie();
 
     Map<String, Object> getsameVodName(int page, int limit);
+
+    void reloadHit(HitEnum type);
 }

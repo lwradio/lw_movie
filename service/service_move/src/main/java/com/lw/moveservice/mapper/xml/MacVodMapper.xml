@@ -38,4 +38,36 @@
         ) b ON a.vod_name = b.vod_name
 <!--        LIMIT #{current}, #{size}-->
     </select>
+
+    <!-- 根据字段名称更新hit-->
+    <update id="updateHitsDay">
+        UPDATE
+        mac_vod
+        SET vod_hits_day = 0
+        WHERE vod_hits_day !=0
+    </update>
+
+    <!-- 根据字段名称更新hit-->
+    <update id="updateHitsWeek">
+        UPDATE
+        mac_vod
+        SET vod_hits_week = 0
+        WHERE vod_hits_week !=0
+    </update>
+
+    <!-- 根据字段名称更新hit-->
+    <update id="updateHitsMonth">
+        UPDATE
+        mac_vod
+        SET vod_hits_month = 0
+        WHERE vod_hits_month !=0
+    </update>
+
+    <!-- 更新全部hit-->
+    <update id="updateHits">
+        UPDATE
+        mac_vod
+        SET vod_hits_day = 0, vod_hits_week = 0, vod_hits_month = 0
+        WHERE vod_hits_day != 0 OR vod_hits_week != 0 OR vod_hits_month != 0
+    </update>
 </mapper>

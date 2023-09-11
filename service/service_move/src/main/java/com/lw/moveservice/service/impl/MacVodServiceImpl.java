@@ -1,8 +1,10 @@
 package com.lw.moveservice.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lw.moveservice.controller.admin.VodDTO;
+import com.lw.moveservice.entity.HitEnum;
+import com.lw.moveservice.entity.front.VodDTO;
 import com.lw.moveservice.entity.MacVod;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
@@ -242,6 +244,25 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         result.put("hasPrevious", macVodPage.hasPrevious());
         result.put("records", items);
         return result;
+    }
+
+    @Override
+    public void reloadHit(HitEnum type) {
+        if (type == null) {
+            baseMapper.updateHits();
+            return;
+        }
+        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_day.toString())) {
+            baseMapper.updateHitsDay();
+            return;
+        }
+        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_week.toString())) {
+            baseMapper.updateHitsWeek();
+            return;
+        }
+        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_month.toString())) {
+            baseMapper.updateHitsMonth();
+        }
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
