@@ -33,14 +33,14 @@ public class MacVodController {
     private MacVodService macVodService;
 
     //电影列表
-    @ApiOperation("查询所有")
-    @GetMapping
-    public R getMoveList() {
-        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
-        wrapper.last("limit 5");
-        List<MacVod> list = macVodService.list(wrapper);
-        return R.ok().data("list", list);
-    }
+//    @ApiOperation("查询所有")
+//    @GetMapping
+//    public R getMoveList() {
+//        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
+//        wrapper.last("limit 5");
+//        List<MacVod> list = macVodService.list(wrapper);
+//        return R.ok().data("list", list);
+//    }
 
 
     //条件查询
