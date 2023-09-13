@@ -123,8 +123,7 @@ public class MacVodController {
     @ApiOperation("重置热度")
     @PutMapping("/hit")
     public R reloadHit(@RequestParam(required = false) HitEnum type) {
-        macVodService.reloadHit(type);
-        return R.ok();
+        return R.ok().data("count", macVodService.reloadHit(type));
     }
 }
 

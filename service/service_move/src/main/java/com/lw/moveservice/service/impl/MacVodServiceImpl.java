@@ -279,22 +279,24 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     }
 
     @Override
-    public void reloadHit(HitEnum type) {
+    public int reloadHit(HitEnum type) {
         if (type == null) {
-            baseMapper.updateHits();
-            return;
+            return baseMapper.updateHits();
         }
-        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_day.toString())) {
-            baseMapper.updateHitsDay();
-            return;
-        }
-        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_week.toString())) {
-            baseMapper.updateHitsWeek();
-            return;
-        }
-        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_month.toString())) {
-            baseMapper.updateHitsMonth();
-        }
+        return baseMapper.update(new MacVod(), new UpdateWrapper<MacVod>()
+                .ne(type.toString(), 0)
+                .set(type.toString(), 0));
+//        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_day.toString())) {
+//            baseMapper.updateHitsDay();
+//            return;
+//        }
+//        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_week.toString())) {
+//            baseMapper.updateHitsWeek();
+//            return;
+//        }
+//        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_month.toString())) {
+//            baseMapper.updateHitsMonth();
+//        }
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存

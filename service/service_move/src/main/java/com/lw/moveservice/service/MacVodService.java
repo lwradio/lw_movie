@@ -37,5 +37,5 @@ public interface MacVodService extends IService<MacVod> {
 
     Map<String, Object> getsameVodName(int page, int limit);
 
-    void reloadHit(HitEnum type);
+    int reloadHit(HitEnum type);
 }
