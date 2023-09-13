@@ -1,5 +1,6 @@
 package com.lw.servicebase.config.douban;
 
+import com.lw.servicebase.config.douban.entity.DouBanTypeEnum;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -11,7 +12,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.StringUtils;
 
-import javax.swing.text.html.HTML;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -103,10 +103,10 @@ public class DouBanConfig {
         return null;
     }
 
-    public static List<String> startLoad(String type, String limit, String start) throws URISyntaxException {
+    public static List<String> startLoad(DouBanTypeEnum type, String limit, String start) throws URISyntaxException {
         map.put("tag", "热门");
         map.put("sort", "recommend");
-        map.put("type", type);
+        map.put("type", type.name());
         map.put("page_limit", limit);
         map.put("page_start", start);
         //设置请求头

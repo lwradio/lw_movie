@@ -1,7 +1,7 @@
 package com.lw.moveservice.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lw.moveservice.entity.HitEnum;
 import com.lw.moveservice.entity.front.VodDTO;
@@ -13,6 +13,7 @@ import com.lw.moveservice.mapper.MacVodMapper;
 import com.lw.moveservice.service.MacVodService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lw.servicebase.config.douban.DouBanConfig;
+import com.lw.servicebase.config.douban.entity.DouBanTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -125,29 +126,60 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
     //更新幻灯片推荐
     @Override
     public boolean updateLevel() {
-        List<String> move = null;
-        List<String> tv = null;
+        List<String> movie;
+        List<String> tv;
         //先将之前的推荐清除
         baseMapper.cancelLevel();
         try {
             //前6条为幻灯片，后6条为推荐
-            move = DouBanConfig.startLoad("move", "12", "0");
-            tv = DouBanConfig.startLoad("tv", "12", "0");
+            movie = DouBanConfig.startLoad(DouBanTypeEnum.movie, "12", "0");
+            tv = DouBanConfig.startLoad(DouBanTypeEnum.tv, "12", "0");
         } catch (URISyntaxException e) {
             e.printStackTrace();
-        }
-        if (move == null || tv == null) {
             return false;
         }
-        for (int i = 0; i < move.size(); i++) {
-            if (i <= 5) {
-                baseMapper.updateTopLevel(move.get(i));
-                baseMapper.updateTopLevel(tv.get(i));
-            } else {
-                baseMapper.updateLevel(move.get(i));
-                baseMapper.updateLevel(tv.get(i));
+        if (movie == null || tv == null) {
+            return false;
+        }
+        List<MacVod> vodList = baseMapper.selectList(new QueryWrapper<MacVod>()
+                .in("vod_name", movie)
+                .or()
+                .in("vod_name", tv)
+                .select("vod_id", "vod_name")
+                .orderByAsc("vod_name"));
+        if (vodList == null || vodList.isEmpty()) {
+            return false;
+        }
+        List<Long> ids = new ArrayList<>();
+        String name = null;
+        for (MacVod macVod : vodList) {
+            if (StringUtils.isBlank(name) || !StringUtils.equalsIgnoreCase(name, macVod.getVodName())) {
+                name = macVod.getVodName();
+                ids.add(macVod.getVodId());
             }
+        }
+        int totalSize = ids.size();
+        int update1Count = totalSize / 2; // 更新为1的数据数量
+        List<Long> updateTopLevels = new ArrayList<>();
+        List<Long> updateLevels = new ArrayList<>();
+        for (Long id : ids) {
+            if (update1Count > 0) {
+                updateLevels.add(id);
+                update1Count--;
+            } else {
+                updateTopLevels.add(id);
+            }
+        }
+        if (!updateLevels.isEmpty()) {
+            baseMapper.update(new MacVod(), new UpdateWrapper<MacVod>()
+                    .in("vod_id", updateLevels)
+                    .set("vod_level", 1));
+        }
 
+        if (!updateTopLevels.isEmpty()) {
+            baseMapper.update(new MacVod(), new UpdateWrapper<MacVod>()
+                    .in("vod_id", updateTopLevels)
+                    .set("vod_level", 9));
         }
         return true;
     }

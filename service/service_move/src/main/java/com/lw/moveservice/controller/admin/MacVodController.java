@@ -102,8 +102,8 @@ public class MacVodController {
     @ApiOperation("爬取豆瓣热门榜单更新推荐")
     @PutMapping("/level")
     public R updateLevel() {
-        boolean flage = macVodService.updateLevel();
-        return flage ? R.ok() : R.error();
+        boolean flag = macVodService.updateLevel();
+        return flag ? R.ok() : R.error();
     }
 
     @ApiOperation("查询推荐的影视")

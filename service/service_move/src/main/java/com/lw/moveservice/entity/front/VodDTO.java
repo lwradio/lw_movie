@@ -1,6 +1,5 @@
-package com.lw.moveservice.controller.admin;
+package com.lw.moveservice.entity.front;
 
-import com.lw.moveservice.entity.front.VodPlayer;
 import lombok.Data;
 
 import java.util.List;
