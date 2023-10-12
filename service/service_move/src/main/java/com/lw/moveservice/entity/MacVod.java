@@ -1,9 +1,11 @@
 package com.lw.moveservice.entity;
 
 import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author lw
@@ -25,7 +27,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="MacVod对象", description="")
+@ApiModel(value = "MacVod对象", description = "")
 public class MacVod implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,9 +35,11 @@ public class MacVod implements Serializable {
     @TableId(value = "vod_id", type = IdType.AUTO)
     private Long vodId;
 
+    //子类型id
     private Long typeId;
 
-    @TableField(value ="type_id_1")
+    //父类型id
+    @TableField(value = "type_id_1")
     private Long typeId1;
 
     private Long groupId;
@@ -197,7 +201,7 @@ public class MacVod implements Serializable {
     private String vodPlotDetail;
 
     private int isDelete;
-//格式化后的播放器列表
+    //格式化后的播放器列表
     @TableField(exist = false)
     private List<VodPlayer> playList;
 

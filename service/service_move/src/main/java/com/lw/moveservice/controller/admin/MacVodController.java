@@ -2,15 +2,18 @@ package com.lw.moveservice.controller.admin;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lw.commonutils.R;
 import com.lw.moveservice.entity.HitEnum;
 import com.lw.moveservice.entity.MacVod;
+import com.lw.moveservice.entity.VodHitsDTO;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
 import com.lw.moveservice.service.MacVodService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,16 +34,6 @@ import java.util.Map;
 public class MacVodController {
     @Autowired
     private MacVodService macVodService;
-
-    //电影列表
-//    @ApiOperation("查询所有")
-//    @GetMapping
-//    public R getMoveList() {
-//        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
-//        wrapper.last("limit 5");
-//        List<MacVod> list = macVodService.list(wrapper);
-//        return R.ok().data("list", list);
-//    }
 
 
     //条件查询
@@ -106,6 +99,13 @@ public class MacVodController {
         return flag ? R.ok() : R.error();
     }
 
+//    @ApiOperation("爬取豆瓣热门榜单")
+//    @GetMapping("/level")
+//    public R getDouBan() {
+//        boolean flag = macVodService.updateLevel();
+//        return flag ? R.ok() : R.error();
+//    }
+
     @ApiOperation("查询推荐的影视")
     @GetMapping("/level")
     public R getLevelMovie() {
@@ -124,6 +124,30 @@ public class MacVodController {
     @PutMapping("/hit")
     public R reloadHit(@RequestParam(required = false) HitEnum type) {
         return R.ok().data("count", macVodService.reloadHit(type));
+    }
+
+    @ApiOperation("查询没有豆瓣id的影片")
+    @GetMapping("/withOutDoubanId")
+    public R withOutDoubanId(@RequestParam int page, @RequestParam int limit,
+                             @RequestBody(required = false) QueryMove queryMove) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        Page<MacVod> macVodPage = macVodService.withOutDoubanId(pageRequest, queryMove);
+        return R.ok().data("count", macVodPage);
+    }
+
+    @ApiOperation("根据vodId数组获取对应豆瓣id并且填充")
+    @PutMapping("/douBanId/ids")
+    public R getDouBanIds(@RequestBody List<Long> ids) {
+        macVodService.getDouBanIds(ids);
+        return R.ok();
+    }
+
+    @ApiOperation("查询vod类型点击量排行榜")
+    @GetMapping("/{typeId}/hit/rank")
+    public R getHitRank(@RequestParam HitEnum type, @RequestParam(required = false) int limit,
+                        @PathVariable Long typeId) {
+        List<VodHitsDTO> vodHitsDTOS = macVodService.getHitRank(type, limit,typeId);
+        return R.ok().data("data", vodHitsDTOS);
     }
 }
 

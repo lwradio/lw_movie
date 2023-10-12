@@ -1,12 +1,15 @@
 package com.lw.moveservice.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lw.moveservice.entity.HitEnum;
 import com.lw.moveservice.entity.MacVod;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lw.moveservice.entity.VodHitsDTO;
 import com.lw.moveservice.entity.front.LevelMovie;
 import com.lw.moveservice.entity.front.QueryMove;
 import com.lw.moveservice.entity.front.VodPlayer;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -38,4 +41,10 @@ public interface MacVodService extends IService<MacVod> {
     Map<String, Object> getsameVodName(int page, int limit);
 
     int reloadHit(HitEnum type);
+
+    Page<MacVod> withOutDoubanId(PageRequest pageRequest, QueryMove queryMove);
+
+    void getDouBanIds(List<Long> ids);
+
+    List<VodHitsDTO> getHitRank(HitEnum type, int limit, Long typeId);
 }

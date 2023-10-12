@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lw.moveservice.entity.HitEnum;
+import com.lw.moveservice.entity.VodHitsDTO;
 import com.lw.moveservice.entity.front.VodDTO;
 import com.lw.moveservice.entity.MacVod;
 import com.lw.moveservice.entity.front.LevelMovie;
@@ -16,6 +17,7 @@ import com.lw.servicebase.config.douban.DouBanConfig;
 import com.lw.servicebase.config.douban.entity.DouBanTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
@@ -80,7 +82,6 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
         boolean hasNext = macVodPage.hasNext();
         boolean hasPrevious = macVodPage.hasPrevious();
         List<MacVod> records = macVodPage.getRecords();
-
         Map<String, Object> map = new HashMap<>();
         map.put("items", records);
         map.put("current", current);
@@ -297,6 +298,82 @@ public class MacVodServiceImpl extends ServiceImpl<MacVodMapper, MacVod> impleme
 //        if (StringUtils.equalsAnyIgnoreCase(type.toString(), HitEnum.vod_hits_month.toString())) {
 //            baseMapper.updateHitsMonth();
 //        }
+    }
+
+    @Override
+    public Page<MacVod> withOutDoubanId(PageRequest pageRequest, QueryMove queryMove) {
+        //创建page对象
+        Page<MacVod> macVodPage = new Page<>(pageRequest.getPageNumber(), pageRequest.getPageSize());
+        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
+        //判断条件是否为空
+        if (queryMove != null) {
+            String title = queryMove.getVodName();
+            String typeId = queryMove.getTypeId();//二级类型
+            String typeId_1 = queryMove.getTypeIdParent();//一级分类
+            String vodLevel = queryMove.getVodLevel();
+            int isDelete = queryMove.getIsDelete();
+            wrapper.eq("is_delete", isDelete);
+            if (isDelete == 0) {
+                wrapper.eq("vod_status", true);
+            } else {
+                wrapper.eq("vod_status", false);
+            }
+            if (!StringUtils.isEmpty(title)) {
+                wrapper.like("vod_name", title);
+            }
+            if (!StringUtils.isEmpty(typeId)) {
+                wrapper.eq("type_id", typeId);
+            }
+            if (!StringUtils.isEmpty(typeId_1)) {
+                wrapper.eq("type_id_1", typeId_1);
+            }
+            if (!StringUtils.isEmpty(vodLevel)) {
+                wrapper.eq("vod_level", vodLevel);
+            }
+        }
+        //豆瓣id为空
+        wrapper.eq("vod_douban_id", 0);
+        wrapper.orderByDesc("vod_time");
+        //调用方法实现条件查询分页
+        baseMapper.selectPage(macVodPage, wrapper);
+        return macVodPage;
+    }
+
+    @Override
+    public void getDouBanIds(List<Long> ids) {
+        List<MacVod> macVods = baseMapper.selectBatchIds(ids);
+        //更新豆瓣id
+        macVods.stream()
+                .filter(Objects::nonNull)
+                .forEach(macVod -> {
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("vodName", macVod.getVodName());
+                    Integer douBanID = DouBanConfig.getDouBanId(parameters);
+                    if (douBanID != 0) {
+                        MacVod updateVod = new MacVod();
+                        updateVod.setVodId(macVod.getVodId());
+                        updateVod.setVodDoubanId(douBanID);
+                        baseMapper.updateById(updateVod);
+                    }
+
+                });
+    }
+
+    @Override
+    public List<VodHitsDTO> getHitRank(HitEnum type, int limit, Long typeId) {
+        String count = "limit " + limit;
+        QueryWrapper<MacVod> wrapper = new QueryWrapper<>();
+        wrapper.eq("type_id_1", typeId);
+        wrapper.orderByDesc(type.name());
+        wrapper.last(count);
+        List<MacVod> macVods = baseMapper.selectList(wrapper);
+        return macVods.stream().filter(Objects::nonNull)
+                .map(macVod -> {
+                            VodHitsDTO vodHitsDTO = new VodHitsDTO();
+                            BeanUtils.copyProperties(macVod, vodHitsDTO);
+                            return vodHitsDTO;
+                        }
+                ).collect(Collectors.toList());
     }
 
     //对前端的播放器字符串与地址字符串进行格式化：播放器之间用$$$隔离储存，url地址中每个播放器地址间用$$$隔离，其中每集用#隔离储存
